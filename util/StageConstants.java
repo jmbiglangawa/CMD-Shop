@@ -11,6 +11,7 @@ public class StageConstants {
     public static final String MANAGE_ADD = "manageAdd";
     public static final String MANAGE_REMOVE = "manageRemove";
     public static final String MANAGE_MODIFY = "manageModify";
+    public static final String MANAGE_DISPLAY = "manageDisplay";
 
     public static final String QUIT = "quit";
     public static final String RETURN = "return";
@@ -23,7 +24,8 @@ public class StageConstants {
         put(MAIN_MANAGE + "1", MANAGE_ADD);
         put(MAIN_MANAGE + "2", MANAGE_REMOVE);
         put(MAIN_MANAGE + "3", MANAGE_MODIFY);
-        put(MAIN_MANAGE + "4", RETURN);
+        put(MAIN_MANAGE + "4", MANAGE_DISPLAY);
+        put(MAIN_MANAGE + "5", RETURN);
 
 
     }};

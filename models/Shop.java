@@ -2,10 +2,13 @@ package models;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import exception.ItemAlreadyExistsException;
 import exception.ItemNotFoundException;
 import exception.ProductMissingInfoException;
+import util.PrinterConstants;
 
 public class Shop {
     private String name = "CMDShop";
@@ -57,6 +60,11 @@ public class Shop {
 
         Boolean isSuccess = false;
         Item itemToModify = getItem(productId);
+        
+        if(itemToModify == null) {
+            throw new ItemNotFoundException(productId);
+        }
+
         if(propertyToModify == 1) {
             isSuccess = true;
             itemToModify.setProductId(Long.parseLong(newValue));
@@ -79,12 +87,25 @@ public class Shop {
                 break;
             }
         }
-
-        if(item == null) {
-            throw new ItemNotFoundException(productId);
-        }
-
         return item;
+    }
+
+    public List<String> getShopListDesc() {
+        List<String> shopListDesc = new ArrayList<String>();
+        shopListDesc.add(PrinterConstants.ITEMS_HEADER);
+        shopListDesc.add(PrinterConstants.PERISHABLE_HEADER);
+        shopListDesc.addAll(this.items.stream()
+            .filter(item -> item.getIsPerishable())
+            .map(Item::toString)
+            .collect(Collectors.toList()));
+
+        shopListDesc.add(PrinterConstants.NON_PERISHABLE_HEADER);
+        shopListDesc.addAll(this.items.stream()
+            .filter(item -> !item.getIsPerishable())
+            .map(Item::toString)
+            .collect(Collectors.toList()));
+        
+        return shopListDesc;
     }
 
 
