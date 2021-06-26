@@ -7,6 +7,8 @@ CMDShop is an e-commerce command line simple Java activity program that can chal
 ## Requirements
 You can use Java or any programming language you are comfortable with. The instructions provided are expecting that you are using Windows and uses Powershell or CMD.
 
+For the command roadmap, visit https://hackmd.io/@B0QcUsgTT72JWTIaKiMk3w/HJUCj_4h_
+
 
 ## How can I use your code then? 🤔
 

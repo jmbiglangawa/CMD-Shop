@@ -63,6 +63,6 @@ public final class PrinterConstants {
     public static final String QUESTION_MODIFY_3 = "Modify which property?";
     public static final String QUESTION_MODIFY_4 = "Enter your new [id/name/price/is perishable]";
     public static final String QUESTION_SHOP_BUY = "Type a product ID to buy [or C to checkout and Q to quit]";
-    public static final String QUESTION_ANY_KEY = "Press any key to return to previous page";
+    public static final String QUESTION_ANY_KEY = "Press any key to return to main menu";
 
 }
