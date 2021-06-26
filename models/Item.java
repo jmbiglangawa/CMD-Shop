@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Objects;
+
 public class Item {
     private Long productId;
     private String name;
@@ -12,6 +14,10 @@ public class Item {
         this.name = name;
         this.price = price;
         this.isPerishable = isPerishable;
+    }
+
+    public Item(Float price) {
+        this.price = price;
     }
     
 
@@ -57,6 +63,32 @@ public class Item {
     public String toString() {
         return "[" + getProductId() + "] " + getName() + " - ₱" + getPrice();
     }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Item) || !(o instanceof Long)) {
+            return false;
+        }
+        
+        if(o instanceof Item) {
+            Item item = (Item) o;
+            return Objects.equals(productId, item.productId) && Objects.equals(name, item.name) && Objects.equals(price, item.price) && Objects.equals(isPerishable, item.isPerishable);
+        }else if(o instanceof Long){
+            Long productId = (Long) o;
+            return Objects.equals(this.productId, productId);
+        }else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(productId, name, price, isPerishable);
+    }
+
 
 
 }

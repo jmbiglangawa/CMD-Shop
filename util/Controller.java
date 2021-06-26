@@ -7,50 +7,51 @@ import java.util.List;
 
 import exception.ItemAlreadyExistsException;
 import exception.ItemNotFoundException;
+import exception.NoItemInCartException;
 import exception.ProductMissingInfoException;
 import exception.QuitTriggerException;
 import exception.SelectionNotFoundException;
 import models.Item;
 import models.Shop;
+import models.ShoppingCart;
 
 public class Controller {
     private Shop shop = new Shop();
+    private ShoppingCart shoppingCart = new ShoppingCart();
     private Printer printer = new Printer(shop.getName());
     private BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
     private String currentStage = StageConstants.MAIN_MENU;
-    private String previousStage = "";
-
-    private String currentInput = "";
-
+    
 
     public void start() {    
         while(true) {
             try {
                 navigate();
-            } catch (NumberFormatException | IOException | ItemNotFoundException | ItemAlreadyExistsException
+            } catch (NumberFormatException | IOException | ItemAlreadyExistsException
                     | ProductMissingInfoException | SelectionNotFoundException e) {
                 printer.setErrorMessage(e.getMessage());
-                e.printStackTrace();
+            } catch(ItemNotFoundException e) {
+                printer.setErrorMessage(e.getMessage());
+                setCurrentStage(StageConstants.MAIN_MANAGE);
+            } catch(NoItemInCartException e) {
+                printer.setErrorMessage(e.getMessage());
+                setCurrentStage(StageConstants.MAIN_SHOP);
             } catch(QuitTriggerException e) {
                 printer.printMessage(PrinterConstants.EXIT_MESSAGE);
-                e.printStackTrace();
                 break;
             } catch(Exception e) {
                 printer.setErrorMessage(PrinterConstants.EXCEPTION_MESSAGE);
-                e.printStackTrace();
             }
         }
     }
 
 
     public void navigate() throws IOException, SelectionNotFoundException, QuitTriggerException, 
-            NumberFormatException, ItemNotFoundException, ItemAlreadyExistsException, ProductMissingInfoException {
+            NumberFormatException, ItemNotFoundException, ItemAlreadyExistsException, ProductMissingInfoException, 
+            NoItemInCartException {
         // Print current stage
         switch(currentStage) {
-            case StageConstants.MAIN_SHOP:
-                printer.printScreen(PrinterConstants.GO_SHOPPING);
-                break;
             case StageConstants.MAIN_MANAGE:
                 printer.printScreen(PrinterConstants.MANAGE_ITEMS);
                 break;
@@ -59,24 +60,53 @@ public class Controller {
                 setCurrentStage(StageConstants.MAIN_MANAGE);
                 return;
             case StageConstants.MANAGE_DISPLAY:
-                printer.printScreen(PrinterConstants.MANAGE_ITEMS, shop.getShopListDesc());
                 setCurrentStage(StageConstants.MAIN_MANAGE);
+                if(shop.doesItemsExists()) {
+                    printer.printScreen(PrinterConstants.MANAGE_ITEMS, shop.getShopListDesc());
+                }else {
+                    printer.setNotification(PrinterConstants.NOTIF_NO_ITEMS);
+                    return;
+                }
                 break;
             case StageConstants.MANAGE_MODIFY:
                 modifyItem();
                 setCurrentStage(StageConstants.MAIN_MANAGE);
                 return;
+            case StageConstants.MANAGE_REMOVE:
+                removeItem();
+                setCurrentStage(StageConstants.MAIN_MANAGE);
+                return;
+            case StageConstants.MAIN_SHOP:
+                printer.printScreen(shoppingCart.getItemsDesc(), PrinterConstants.QUESTION_SHOP_BUY, shop.getShopListDesc());
+                break;
+            case StageConstants.SHOP_CHECKOUT:
+                printer.printScreen(shoppingCart.checkout(), PrinterConstants.QUESTION_ANY_KEY);
+                break;
             case StageConstants.QUIT:
                 throw new QuitTriggerException();
             default:
                 printer.printScreen(PrinterConstants.MAIN_MENU);
         }
         
-        currentInput = reader.readLine();
+        String currentInput = reader.readLine();
+
+        String nextStage = StageConstants.INPUT_MAP.get(currentStage.concat(currentInput));
+        if((nextStage != null && nextStage.equals(StageConstants.RETURN)) || currentStage == StageConstants.SHOP_CHECKOUT) {
+            setCurrentStage(StageConstants.MAIN_MENU);
+            return;
+        }
 
         // Evaluate user input
-        String nextStage = StageConstants.INPUT_MAP.get(currentStage.concat(currentInput));
-        setCurrentStage(nextStage);
+        if(currentStage != StageConstants.MAIN_SHOP) {
+            setCurrentStage(nextStage);
+        }else {
+            if(nextStage == null) {
+                shoppingCart.addItem(shop.putItemToCart(Long.parseLong(currentInput)));
+                setCurrentStage(StageConstants.MAIN_SHOP);
+            }else if(nextStage.equals(StageConstants.SHOP_CHECKOUT)) {
+                setCurrentStage(nextStage);
+            }
+        }
     }
 
     public void createNewItem() throws IOException, NumberFormatException, ItemNotFoundException, 
@@ -93,11 +123,15 @@ public class Controller {
         }
     }
 
-    public void modifyItem() throws NumberFormatException, IOException, ItemNotFoundException {
+    public void modifyItem() throws NumberFormatException, IOException, ItemNotFoundException, SelectionNotFoundException {
         printer.printQuestion(PrinterConstants.QUESTION_MODIFY_1);
         Long productId = Long.parseLong(reader.readLine());
         
         Item itemToModify = shop.getItem(productId);
+        if(itemToModify == null) {
+            throw new ItemNotFoundException(productId);
+        }
+
         printer.printMessage(
             String.format(PrinterConstants.QUESTION_MODIFY_2, 
                 itemToModify.getProductId(), 
@@ -106,7 +140,13 @@ public class Controller {
                 itemToModify.getIsPerishable() ? "Y" : "N"));
         
         printer.printQuestion(PrinterConstants.QUESTION_MODIFY_3);
-        int propertyToModify = Integer.parseInt(reader.readLine());
+        int propertyToModify = 0;
+        propertyToModify = Integer.parseInt(reader.readLine());
+
+        if(propertyToModify < 0 && propertyToModify > 5) {
+            throw new SelectionNotFoundException();
+        }
+
         printer.printMessage(""); // Print a blank space
         
         printer.printQuestion(PrinterConstants.QUESTION_MODIFY_4);
@@ -120,6 +160,21 @@ public class Controller {
         }else if(propertyToModify == 4) {
             itemToModify.setIsPerishable(newValue.equals("Y"));
         }
+
+        printer.setNotification(PrinterConstants.NOTIF_MODIFY);
+    }
+
+    public Boolean removeItem() throws NumberFormatException, IOException, ItemNotFoundException {
+        printer.printQuestion(PrinterConstants.QUESTION_MODIFY_1);
+        Long productId = Long.parseLong(reader.readLine());
+        boolean result = shop.removeItem(productId);
+
+        if(result) {
+            printer.setNotification(PrinterConstants.NOTIF_REMOVE);
+        }else {
+            printer.setErrorMessage(PrinterConstants.EXCEPTION_MESSAGE);
+        }
+        return result;
     }
 
     public String getCurrentStage() {
@@ -131,7 +186,6 @@ public class Controller {
             throw new SelectionNotFoundException();
         }
         
-        this.previousStage = this.currentStage;
         this.currentStage = currentStage;
     }
 

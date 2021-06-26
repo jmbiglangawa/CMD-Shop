@@ -19,8 +19,24 @@ public class Printer {
         printScreen(wordsToPrint, null, null);
     }
 
+    public void printScreen(String[] wordsToPrint, String customQuestion) {
+        printScreen(wordsToPrint, customQuestion, null);
+    }
+
     public void printScreen(String[] wordsToPrint, List<String> shopDesc) {
         printScreen(wordsToPrint, null, shopDesc);
+    }
+
+    public void printScreen(List<String> wordsToPrint) {
+        printScreen(wordsToPrint, null, null);
+    }
+
+    public void printScreen(List<String> wordsToPrint, String customQuestion) {
+        printScreen(wordsToPrint, customQuestion, null);
+    }
+
+    public void printScreen(List<String> wordsToPrint, String customQuestion, List<String> shopDesc) {
+        printScreen(wordsToPrint.toArray(new String[0]), customQuestion, shopDesc);
     }
     
     public void printScreen(String[] wordsToPrint, String customQuestion, List<String> shopDesc) {

@@ -1,6 +1,6 @@
 package util;
 
-public class PrinterConstants {
+public final class PrinterConstants {
     
     public static final String[] MAIN_MENU = {
         "1. Go shopping",
@@ -8,14 +8,20 @@ public class PrinterConstants {
         "3. Quit"
     };
 
-    public static final String[] GO_SHOPPING = {
-        "Shopping directory"
-    };
+    public static final String GO_SHOPPING = "Shopping directory";
 
     public static final String NON_PERISHABLE_HEADER = " - Non-perishable";
     public static final String PERISHABLE_HEADER = " - Perishable";
     public static final String ITEMS_HEADER = "Items";
     public static final String MANAGE_ITEMS_HEADER = "Manage items";
+    public static final String NO_ITEMS = "     No items yet";
+
+    public static final String SHOPPING_CART = "Shopping cart:";
+    public static final String CART_NO_ITEMS = "- No items in the cart";
+    public static final String RECEIPT = "Receipt";
+    public static final String RECEIPT_THANK = "Thank you for shopping!";
+    public static final String RECEIPT_TOTAL = "Total: ";
+
 
     public static final String[] MANAGE_ITEMS = {
         MANAGE_ITEMS_HEADER,
@@ -40,9 +46,12 @@ public class PrinterConstants {
     public static final String NOTIF_ADD = "Your item has been added to the shop!";
     public static final String NOTIF_REMOVE = "Your item has been removed from the shop!";
     public static final String NOTIF_MODIFY = "Your item has been modified!";
+    public static final String NOTIF_NO_ITEMS = "There are no items in the shop yet";
+    
 
     public static final String COMMON_INPUT = "Please enter your input";
     public static final String EXCEPTION_MESSAGE = "An unknown error has occurred";
+    public static final String EXCEPTION_INVALID_INPUT = "You entered an invalid input";
     public static final String EXIT_MESSAGE = "\n\nThank you for using this app!";
 
     public static final String QUESTION_MODIFY_1 = "Enter your product ID";
@@ -53,5 +62,7 @@ public class PrinterConstants {
         "[4] Is perishable: %s";
     public static final String QUESTION_MODIFY_3 = "Modify which property?";
     public static final String QUESTION_MODIFY_4 = "Enter your new [id/name/price/is perishable]";
+    public static final String QUESTION_SHOP_BUY = "Type a product ID to buy [or C to checkout and Q to quit]";
+    public static final String QUESTION_ANY_KEY = "Press any key to return to previous page";
 
 }
